@@ -19,13 +19,30 @@ function Clientes() {
       });
   }, []);
 
+  // Función para eliminar cliente
+  const eliminarCliente = async (id) => {
+    const confirmar = window.confirm('¿Estás seguro de que deseas eliminar este cliente?');
+    if (!confirmar) return;
+
+    try {
+      // Petición DELETE a tu API
+      await api.delete(`/clientes/${id}`);
+      
+      // Actualiza el estado local filtrando el cliente eliminado sin recargar la página
+      setClientes(clientes.filter(cliente => cliente.id_cliente !== id));
+    } catch (err) {
+      console.error('Error al eliminar cliente:', err);
+      alert('No se pudo eliminar el cliente. Verifica que el backend tenga configurada la ruta DELETE.');
+    }
+  };
+
   if (cargando) return <p className="mt-3">Cargando clientes...</p>;
   if (error) return <p className="mt-3 text-danger">{error}</p>;
 
   return (
     <div className="container mt-4">
       <h2>Listado de Clientes</h2>
-      <table className="table table-striped table-bordered">
+      <table className="table table-striped table-bordered align-middle">
         <thead className="table-dark">
           <tr>
             <th>ID</th>
@@ -33,6 +50,7 @@ function Clientes() {
             <th>Contacto</th>
             <th>Departamento</th>
             <th>Ciudad</th>
+            <th>Acciones</th>
           </tr>
         </thead>
         <tbody>
@@ -43,6 +61,14 @@ function Clientes() {
               <td>{c.contacto}</td>
               <td>{c.departamento}</td>
               <td>{c.ciudad}</td>
+              <td>
+                <button 
+                  className="btn btn-danger btn-sm"
+                  onClick={() => eliminarCliente(c.id_cliente)}
+                >
+                  Eliminar
+                </button>
+              </td>
             </tr>
           ))}
         </tbody>
